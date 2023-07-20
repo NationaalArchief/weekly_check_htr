@@ -393,7 +393,7 @@
                 // Create a temporary link element
                 let link = document.createElement("a");
                 link.href = URL.createObjectURL(blob);
-                link.download = currentPair.txt.name.replace('.txt', 'gt.txt'); // Update file name
+                link.download = currentPair.txt.name.replace('.txt', '__gt.txt'); // Update file name
 
                 // Programmatically click the link to trigger the download
                 link.click();
