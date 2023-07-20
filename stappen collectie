@@ -1,0 +1,6 @@
+1. krijg een steekproef van controle
+2. transcribeer de steekproef
+3. run create_train_data_500 /home/rutger/data/7 /home/rutger/data/train_7  (vul de locatie van de steekproef in, en de naam van waar je wil dat de trainingsdata naar toe gaat)
+4. run grab_files_and_images /home/rutger/data/train_7  /home/rutger/data/train_7_output
+5. zet deze files op de terminal server
+6. run de dingen.

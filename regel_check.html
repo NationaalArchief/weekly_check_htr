@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html>
+<!-- currently broken, save is fixed, but not all the the output gt's are made. I need to  implement a code that takes the files and outputs it as a zip.-->
+
+<head>
+    <title>Groundtruth developer Weekly</title>
+    <style>
+        #fileContainer {
+            height: 300px;
+            /* Set a fixed height for the container */
+            overflow-y: auto;
+            /* Add vertical scrollbar if content exceeds the container height */
+        }
+    </style>
+</head>
+
+<body>
+    <h1>File Upload and Edit</h1>
+
+    <!-- File upload form -->
+    <form>
+        <input type="file" id="fileUpload" accept=".png,.txt" multiple>
+        <button type="button" onclick="uploadFiles()">Upload</button>
+    </form>
+
+    <!-- Display uploaded files -->
+    <div id="fileContainer"></div>
+    <button type="button" onclick="applyChangesAndPrevious()">Previous</button>
+    <button type="button" onclick="applyChangesAndNext()">Next</button>
+
+    <!-- Textbox prompt for editing -->
+    <h2>Edit Text File</h2>
+    <div id="fileContentContainer">
+        <p>Original Content:</p>
+        <p id="originalContent"></p>
+        <br>
+        <p>Changed Content:</p>
+        <p id="changedContent"></p>
+    </div>
+    <textarea id="fileContent" rows="10" cols="50"></textarea>
+    <br><br>
+    <p id="cer">CER: </p>
+    <p id="capitalIndependentCER">Capital Independent CER: </p>
+    <p id="simpleCER">Simple CER: </p>
+    <button type="button" onclick="applyChanges()">Apply</button>
+    <br><br>
+    <button type="button" onclick="saveFileWithContentMap()">Save</button>
+
+
+    <h1>File Pair Table</h1>
+    <table id="filePairTable">
+        <tr>
+            <th>Index</th>
+            <th>File Pair</th>
+            <th>Original Content</th>
+            <th>Changed Content</th>
+            <th>CER 1</th>
+            <th>CER 2</th>
+            <th>CER 3</th>
+        </tr>
+    </table>
+
+    <script src="FileSaver.js_2.0.0_FileSaver.min.js"></script>
+    <script src="jszip_3.10.1_jszip.min.js"></script>
+
+
+    <!-- Script -->
+    <script>
+        let filePairs = {}; // Clear previous file pairs
+        let currentPairIndex = 0; // Index of the current file pair
+        let changedContentMap = {}; // Object to store changed content for each file pair
+        console.log(saveAs)
+        console.log(JSZip)
+
+        // Iterate over the filePairs array
+        for (let i = 0; i < filePairs.length; i++) {
+            const pair = filePairs[i];
+
+            // Check if the pair consists of a TXT and PNG file
+            if (pair.file1.endsWith('.txt') && pair.file2.endsWith('.png')) {
+                // Add an entry to the changedContentMap for the current pair index
+                changedContentMap[i] = {
+                    txtContent: pair.file1Content,
+                    changedtxtContent: pair.file1Content,
+                    pngContent: pair.file2Content
+                };
+            }
+        }
+        let averageCER = 0; // Average CER
+        let averageCapitalIndependentCER = 0; // Average Capital Independent CER
+        let averageSimpleCER = 0; // Average Simple CER
+        let numChanges = 0; // Number of changes made
+
+
+        // Function to add a new row to the table
+        function addRow(indx, filePair, originalContent, changedContent, cer1, cer2, cer3) {
+            let table = document.getElementById("filePairTable");
+            let row = table.insertRow(-1);
+
+            let filePairIndex = row.insertCell(0);
+            filePairIndex.innerHTML = indx;
+
+            let filePairCell = row.insertCell(1);
+            filePairCell.innerHTML = filePair;
+
+            let originalContentCell = row.insertCell(2);
+            originalContentCell.innerHTML = originalContent;
+
+            let changedContentCell = row.insertCell(3);
+            changedContentCell.innerHTML = changedContent;
+
+            let cer1Cell = row.insertCell(4);
+            cer1Cell.innerHTML = cer1;
+
+            let cer2Cell = row.insertCell(5);
+            cer2Cell.innerHTML = cer2;
+
+            let cer3Cell = row.insertCell(6);
+            cer3Cell.innerHTML = cer3;
+        }
+
+        function updateRow(indx, filePair, originalContent, changedContent, cer1, cer2, cer3) {
+            let table = document.getElementById("filePairTable");
+            let row = table.rows[indx + 1];
+
+            row.cells[0].innerHTML = indx;
+            row.cells[1].innerHTML = filePair;
+            row.cells[2].innerHTML = originalContent;
+            row.cells[3].innerHTML = changedContent;
+            row.cells[4].innerHTML = cer1;
+            row.cells[5].innerHTML = cer2;
+            row.cells[6].innerHTML = cer3;
+        }
+
+
+
+        async function uploadFiles() {
+            let fileInput = document.getElementById("fileUpload");
+            let fileList = document.getElementById("fileContainer");
+
+            fileList.innerHTML = ""; // Clear previous list
+
+
+            for (let i = 0; i < fileInput.files.length; i++) {
+                let file = fileInput.files[i];
+                let fileName = file.name;
+                let fileType = file.type;
+                let fileExtension = fileName.split(".").pop();
+                let fileBaseName = fileName.substring(0, fileName.lastIndexOf("."));
+
+                if (!filePairs[fileBaseName]) {
+                    filePairs[fileBaseName] = { png: null, txt: "", chngdtxt: "" }
+                }
+
+                // Store file pair
+                if (fileType === "image/png") {
+                    filePairs[fileBaseName].png = file;
+                    console.log("uploadFiles: inside image/png: filePairs[fileBasename]:", filePairs[fileBaseName])
+                }
+
+                if (fileType === "text/plain") {
+                    console.log("uploadFiles: inside text/plain")
+
+                    // Read the text file content
+                    let textContent = await file.text();
+
+                    console.log("uploadFiles: inside text/plain: txt and chngdtxt:", textContent)
+                    filePairs[fileBaseName].txt = textContent;
+                    filePairs[fileBaseName].chngdtxt = textContent;
+
+                    addRow(Math.ceil(i / 2), fileBaseName, textContent, textContent, 0.0, 0.0, 0.0);
+
+                }
+            }
+            console.log(filePairs)
+            // Display the first pair
+            displayCurrentPair(); //this resolves before all the files are read. not sure how to solve that
+
+        }
+
+        function displayCurrentPair() {
+            let fileList = document.getElementById("fileContainer");
+            fileList.innerHTML = ""; // Clear previous display
+            console.log("check display inside")
+            console.log("check display inside: display currentPairIndex:", currentPairIndex);
+            console.log("check display inside:Object Keys:", Object.keys(filePairs))
+            let currentPair = filePairs[Object.keys(filePairs)[currentPairIndex]];
+            console.log("check display inside: currentPair:", currentPair);
+            // Display image
+            let img = document.createElement("img");
+            img.src = URL.createObjectURL(currentPair.png);
+            img.width = 500;
+            fileList.appendChild(img);
+            console.log("check display img", currentPair.png);
+            console.log("check display txt", currentPair.txt);
+            console.log("check display chngdtxt", currentPair.chngdtxt);
+
+            // Display text content
+            let originalContent = document.getElementById("originalContent");
+            let changedContent = document.getElementById("changedContent");
+            let cerElement = document.getElementById("cer");
+            let capitalIndependentCERElement = document.getElementById("capitalIndependentCER");
+            let simpleCERElement = document.getElementById("simpleCER");
+            console.log("check display txt", currentPair.chngdtxt);
+
+            // Set the original text content
+            originalContent.innerHTML = currentPair.txt;
+
+            // Set the text in the textarea for editing
+            document.getElementById("fileContent").value = currentPair.chngdtxt;
+
+            // Clear the changed text content and CER values
+            changedContent.innerHTML = currentPair.chngdtxt;
+            cerElement.innerHTML = "CER: ";
+            capitalIndependentCERElement.innerHTML = "Capital Independent CER: ";
+            simpleCERElement.innerHTML = "Simple CER: ";
+        }
+
+        function previousFile() {
+            currentPairIndex--;
+
+            // Cycle to the last pair if at the beginning
+            if (currentPairIndex < 0) {
+                currentPairIndex = Object.keys(filePairs).length - 1;
+            }
+            console.log(currentPairIndex);
+
+            displayCurrentPair();
+        }
+
+        function nextFile() {
+            currentPairIndex++;
+
+            // Cycle back to the first pair if at the end
+            if (currentPairIndex >= Object.keys(filePairs).length) {
+                currentPairIndex = 0;
+            }
+            console.log(currentPairIndex);
+
+            displayCurrentPair();
+        }
+        // Update average CER values
+        function calculateAverageCER(cercolumn) {
+            let table = document.getElementById("filePairTable");
+            let rows = table.getElementsByTagName("tr");
+            let sumCER = 0;
+            let count = 0;
+
+            for (let i = 0; i < rows.length; i++) {
+                let cells = rows[i].getElementsByTagName("td");
+                if (cells.length >= cercolumn) {
+                    let cerCell = cells[cercolumn];
+                    let cerValue = parseFloat(cerCell.textContent || cerCell.innerText);
+                    if (!isNaN(cerValue)) {
+                        sumCER += cerValue;
+                        count++;
+                    }
+                }
+            }
+
+            let averageCER = count > 0 ? sumCER / count : 0;
+            console.log("Average CER: " + averageCER);
+            return averageCER;
+        }
+
+        function applyChanges() {
+            let content = document.getElementById("fileContent").value;
+            let originalContent = document.getElementById("originalContent").innerHTML;
+            let changedContent = document.getElementById("changedContent");
+            let cerElement = document.getElementById("cer");
+            let capitalIndependentCERElement = document.getElementById("capitalIndependentCER");
+            let simpleCERElement = document.getElementById("simpleCER");
+
+            // Calculate CER values
+            let cer = calculateCER(originalContent, content);
+            let capitalIndependentCER = calculateCER(originalContent.toLowerCase(), content.toLowerCase());
+            let simpleCER = calculateSimpleCER(originalContent.toLowerCase(), content.toLowerCase());
+
+            // Display changed content and CER values
+            changedContent.innerHTML = content;
+            cerElement.innerHTML = "CER: " + cer + "%";
+            capitalIndependentCERElement.innerHTML = "Capital Independent CER: " + capitalIndependentCER + "%";
+            simpleCERElement.innerHTML = "Simple CER: " + simpleCER + "%";
+
+
+
+            // Call the function to calculate and display the average CER
+            let averageCER = calculateAverageCER(4);
+            let averageCapitalIndependentCER = calculateAverageCER(5);
+            let averageSimpleCER = calculateAverageCER(6);
+
+            numChanges++;
+
+            //update changed content not succesfull
+            let currentPair = filePairs[Object.keys(filePairs)[currentPairIndex]];
+            changedContentMap[currentPairIndex] = content;
+            currentPair.chngdtxt = content
+
+            // Ensure that 'i' holds the appropriate value before calling 'updateRow()'
+            let i = currentPairIndex; // Assign the desired value to 'i'
+            let fileBaseName = Object.keys(filePairs)[currentPairIndex];
+
+
+            updateRow(i, fileBaseName, originalContent, content, cer, capitalIndependentCER, simpleCER)
+        }
+
+        function calculateCER(original, changed) {
+            let lenOriginal = original.length;
+            let lenChanged = changed.length;
+            let cer = levenshteinDistance(original, changed);
+            cer = (cer / lenOriginal) * 100;
+            return cer.toFixed(2);
+        }
+
+        function calculateSimpleCER(original, changed) {
+            let lenOriginal = original.length;
+            let lenChanged = changed.length;
+            let cer = levenshteinDistance(original.replace(/[^a-z0-9]/g, ""), changed.replace(/[^a-z0-9]/g, ""));
+            cer = (cer / lenOriginal) * 100;
+            return cer.toFixed(2);
+        }
+
+        function levenshteinDistance(original, changed) {
+            let matrix = [];
+            let i, j, cost;
+
+            let lenOriginal = original.length;
+            let lenChanged = changed.length;
+
+            if (lenOriginal === 0) {
+                return lenChanged;
+            }
+
+            if (lenChanged === 0) {
+                return lenOriginal;
+            }
+
+            for (i = 0; i <= lenOriginal; i++) {
+                matrix[i] = [i];
+            }
+
+            for (j = 0; j <= lenChanged; j++) {
+                matrix[0][j] = j;
+            }
+
+            for (i = 1; i <= lenOriginal; i++) {
+                for (j = 1; j <= lenChanged; j++) {
+                    cost = original.charAt(i - 1) === changed.charAt(j - 1) ? 0 : 1;
+
+                    matrix[i][j] = Math.min(
+                        matrix[i - 1][j] + 1, // Deletion
+                        matrix[i][j - 1] + 1, // Insertion
+                        matrix[i - 1][j - 1] + cost // Substitution
+                    );
+                }
+            }
+
+            return matrix[lenOriginal][lenChanged];
+        }
+
+        function printChangedContentMap() {
+            let content = "";
+
+            for (const filePair of Object.values(filePairs)) {
+                let originalContent = "";
+                // Read the text content of the original file
+                originalContent = filePair.txt
+                content += "Original Content:\n" + originalContent + "\n";
+                content += "Changed Content:\n" + filePair.chngdtxt + "\n";
+                content += "------------------------\n";
+            }
+            // Check if it's the last entry in the map
+            // Create a new blob with the content
+            let blob = new Blob([content], { type: "text/plain" });
+
+            // Create a temporary link element
+            let link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "changed_content_map.txt";
+
+            // Programmatically click the link to trigger the download
+            link.click();
+        }
+
+        function saveFile() {
+            let content = changedContentMap[currentPairIndex];
+            let currentPair = filePairs[Object.keys(filePairs)[currentPairIndex]];
+
+            if (currentPair && currentPair.txt) {
+                // Create a new blob with the updated content
+                let blob = new Blob([content], { type: "text/plain" });
+
+                // Create a temporary link element
+                let link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = currentPair.txt.name.replace('.txt', 'gt.txt'); // Update file name
+
+                // Programmatically click the link to trigger the download
+                link.click();
+
+                // Call the function to calculate and display the average CER
+                let averageCER = calculateAverageCER(4);
+                let averageCapitalIndependentCER = calculateAverageCER(5);
+                let averageSimpleCER = calculateAverageCER(6);
+
+
+                // Save average CER values to a file
+                let averageCERText = "Average CER: " + averageCER.toFixed(2) + "%";
+                let averageCapitalIndependentCERText = "Average Capital Independent CER: " + averageCapitalIndependentCER.toFixed(2) + "%";
+                let averageSimpleCERText = "Average Simple CER: " + averageSimpleCER.toFixed(2) + "%";
+                let averageCERBlob = new Blob([averageCERText + "\n" + averageCapitalIndependentCERText + "\n" + averageSimpleCERText], { type: "text/plain" });
+                let averageCERLink = document.createElement("a");
+                averageCERLink.href = URL.createObjectURL(averageCERBlob);
+                averageCERLink.download = "average_cer.txt";
+                averageCERLink.click();
+            }
+        }
+
+        function saveFileWithContentMap() {
+            let content = "";
+            let bloblist = [];
+            let zip = new JSZip();
+            //print the changed contentmap
+            printChangedContentMap();
+
+            //create zip files for each thing
+            for (const [filename, filePair] of Object.entries(filePairs)) {
+
+                zip.file(filename, filePair.chngdtxt)
+            }
+            zip.generateAsync({ type: "blob" }).then(function (content) {
+                saveAs(content, "groundtruth zip");
+            });
+            // Call the function to calculate and display the average CER
+            let averageCER = calculateAverageCER(4);
+            let averageCapitalIndependentCER = calculateAverageCER(5);
+            let averageSimpleCER = calculateAverageCER(6);
+
+            // Create a new blob with the updated content
+            let blob = new Blob([content], { type: "text/plain" });
+
+            // Save average CER values to a file
+            let averageCERText = "Average CER: " + averageCER.toFixed(2) + "%";
+            let averageCapitalIndependentCERText = "Average Capital Independent CER: " + averageCapitalIndependentCER.toFixed(2) + "%";
+            let averageSimpleCERText = "Average Simple CER: " + averageSimpleCER.toFixed(2) + "%";
+            let averageCERBlob = new Blob([averageCERText + "\n" + averageCapitalIndependentCERText + "\n" + averageSimpleCERText], { type: "text/plain" });
+            let averageCERLink = document.createElement("a");
+            averageCERLink.href = URL.createObjectURL(averageCERBlob);
+            averageCERLink.download = "average_cer.txt";
+            averageCERLink.click();
+        }
+
+        function applyChangesAndSave() {
+            applyChanges(); // Call the applyChanges() function
+            saveFile(); // Call the saveFile() function
+
+        }
+
+        function applyChangesAndSaveWithContentmap() {
+            applyChanges(); // Call the applyChanges() function
+            saveFileWithContentMap(); // Call the saveFile() function
+
+        }
+
+        function applyChangesAndNext() {
+            applyChanges(); // Call the applyChanges() function
+            nextFile();
+
+
+        }
+
+        function applyChangesAndPrevious() {
+            applyChanges(); // Call the applyChanges() function
+            previousFile();
+
+        }
+
+
+        function grabChangedContent(cercolumn) {
+            let table = document.getElementById("filePairTable");
+            let rows = table.getElementsByTagName("tr");
+
+            for (let i = 0; i < rows.length; i++) {
+                let cells = rows[i].getElementsByTagName("td");
+                if (cells.length >= cercolumn) {
+                    let cerCell = cells[cercolumn];
+                    let changedText = parseFloat(cerCell.textContent || cerCell.innerText);
+                    console.log(changedText)
+                }
+            }
+        }
+
+
+
+    </script>
+</body>
+
+</html>
