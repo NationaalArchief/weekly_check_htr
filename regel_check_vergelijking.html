@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-<!-- versie 1.0.-->
 
 <head>
     <title>Groundtruth developer Weekly</title>
@@ -21,6 +20,11 @@
     <form>
         <input type="file" id="fileUpload" accept=".png,.txt" multiple>
         <button type="button" onclick="uploadFiles()">Upload</button>
+    </form>
+
+    <form>
+        <input type="file" id="fileUploadGT" accept=".txt" multiple>
+        <button type="button" onclick="uploadFilesGroundTruth()">Upload Ground Truth</button>
     </form>
 
     <!-- Display uploaded files -->
@@ -54,9 +58,9 @@
             <th>File Pair</th>
             <th>Original Content</th>
             <th>Changed Content</th>
-            <th>Full Cer</th>
-            <th>Cer Ignoring Capitalisation</th>
-            <th>Simple Cer</th>
+            <th>CER 1</th>
+            <th>CER 2</th>
+            <th>CER 3</th>
         </tr>
     </table>
 
@@ -89,6 +93,7 @@
         let averageCER = 0; // Average CER
         let averageCapitalIndependentCER = 0; // Average Capital Independent CER
         let averageSimpleCER = 0; // Average Simple CER
+        let numChanges = 0; // Number of changes made
 
 
         // Function to add a new row to the table
@@ -169,6 +174,7 @@
 
                     addRow(Math.ceil(i / 2), fileBaseName, textContent, textContent, 0.0, 0.0, 0.0);
 
+
                 }
             }
             console.log(filePairs)
@@ -176,6 +182,42 @@
             displayCurrentPair(); //this resolves before all the files are read. not sure how to solve that
 
         }
+
+        async function uploadFilesGroundTruth() {
+            let fileInput = document.getElementById("fileUploadGT");
+            let fileList = document.getElementById("fileContainer");
+            let gt_list = {}
+
+            for (let i = 0; i < fileInput.files.length; i++) {
+                let file = fileInput.files[i];
+                let fileName = file.name;
+                let fileType = file.type;
+                let fileExtension = fileName.split(".").pop();
+                let fileBaseName = fileName.substring(0, fileName.lastIndexOf("."));
+
+                if (!filePairs[fileBaseName]) {
+                    console.log("uploadFilesGT: GT does not match the content")
+                }
+
+                // Store file pair
+
+                if (fileType === "text/plain") {
+                    console.log("uploadFilesGT: inside text/plain")
+
+                    // Read the text file content
+                    let textContent = await file.text();
+
+                    console.log("uploadFilesGT: inside text/plain: chngdtxt:", textContent)
+                    filePairs[fileBaseName].chngdtxt = textContent;
+
+                    updateRow(Math.ceil(i / 2), fileBaseName, originalContent, textContent, 0.0, 0.0, 0.0);
+
+                }
+            }
+
+        }
+
+
 
         function displayCurrentPair() {
             let fileList = document.getElementById("fileContainer");
@@ -288,6 +330,7 @@
             let averageCapitalIndependentCER = calculateAverageCER(5);
             let averageSimpleCER = calculateAverageCER(6);
 
+            numChanges++;
 
             //update changed content not succesfull
             let currentPair = filePairs[Object.keys(filePairs)[currentPairIndex]];
