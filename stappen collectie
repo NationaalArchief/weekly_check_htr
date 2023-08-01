@@ -1,6 +1,6 @@
-1. krijg een steekproef van controle
-2. transcribeer de steekproef
-3. run create_train_data_500 /home/rutger/data/7 /home/rutger/data/train_7  (vul de locatie van de steekproef in, en de naam van waar je wil dat de trainingsdata naar toe gaat)
-4. run grab_files_and_images /home/rutger/data/train_7  /home/rutger/data/train_7_output
-5. zet deze files op de terminal server
-6. run de dingen.
+1. Krijg een steekproef van controle. 
+2. Transcribeer de steekproef
+3. Run create_train_data_500 /home/rutger/data/7 /home/rutger/data/train_7  (vul de locatie van de steekproef in, en de naam van de map waar je wil dat de trainingsdata naar toe gaat)
+4. Run grab_files_and_images /home/rutger/data/train_7  /home/rutger/data/train_7_output (vul de locatie van de steekproef in, en de naam van de map waar je wil dat de trainingsdata naar toe gaat)
+5. Zet deze files op de terminal server. (op dit moment, plaats de files in de input map van de fileExchangeMap. verplaats daarna de map vanuit een vdi applicatie naar de regel_check_input)
+6. De transcribent runt de vdi van regel_check (zie stappenplan regel_check_transcribent)
