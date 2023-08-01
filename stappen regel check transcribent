@@ -1,7 +1,18 @@
-1. transcribent runt de vdi programma vanaf zijn eigen computer, dit opent een connectie naar de terminal server, en opent daar de regel_check.html tool automatisch
-   nu vind je jezelf op de pagina van de GroundTruth Developer Weekly. Dit is een html pagina waarin bestanden geupload kunnen worden om groundtruth te maken op regel niveau.
-2. de transcribent klikt op de knop "choose files". nu wordt de file explorer geopend. vanuit hier navigeert de transcribent naar de map "regel_check", en dan naar de map "regel_check_input". In die map staan submappen voor elke batch, aangegeven met de code van de batch. 
-3. in de subnaam met de naam van de batch van deze week, vind je een set aan .txt en .png bestanden. 
-4. selecteer elk bestand (bvb. met gebruik van de shortcut ctrl a) en klik op 'open'.
-5. nu zie je in de grou
-6.
+1. De transcribent runt de vdi programma vanaf zijn eigen computer, dit opent een connectie naar de terminal server, en opent daar de regel_check.html tool automatisch.
+op de pagina staat van boven naar beneden: 
+   I. Een afbeelding: Een weergave van de regels zoals ze op de orginele scan staan.
+   II. De knoppen 'previous' en 'next': met deze knoppen  mee je tussen de files heen en weer kaan maneauvreren. 
+   III. "Edit Text File" vak, waarin de text wordt getoond. "Original Content" toont altijd de text zoals deze uit de automatische transcriptie is gekomen en "Changed Content" die de groundtruth toont nadat je aanpassingen hebt gemaakt. 
+   IV. Het text vak, waarin de transcribent de aanpassingen kan making in de text van de automatische transcriptie om Ground Truth te maken. 
+   V.  De Cer vakken: hierin wordt de cer van de regel weergegeven nadat je op "apply hebt geklikt" 
+   VI. De "apply" en "save" knoppen. Met de Apply knop kan je de CER uitrekenen van de regel waar je nu naar kijkt, en worden de aanpassingen die je hebt gedaan weggeschreven. 
+   VII. De tabel. De tabel houdt alle informatie bij van de regels waarvan je groundtruth hebt gemaakt.
+   Nu vind je jezelf op de pagina van de GroundTruth Developer Weekly. Dit is een html pagina waarin bestanden geupload kunnen worden om groundtruth te maken op regel niveau. dit programma opened de .png en .txt files van 1 regel in een transcriptie. 
+2. De transcribent klikt op de knop "choose files". nu wordt de file explorer geopend. vanuit hier navigeert de transcribent naar de map "regel_check", en dan naar de map "regel_check_input". In die map staan submappen voor elke batch, aangegeven met de code van de batch. 
+3. In de subnaam met de naam van de batch van deze week, vind je een set aan .txt en .png bestanden. 
+4. Selecteer elk bestand (bvb. met gebruik van de shortcut ctrl a) en klik op 'open'.
+5. Nu zie je naast de knop "Choose files" staan dat er files klaar staan. Als je op de knop Upload klikt, worden deze ingeladen in de pagina. 
+6. Nu kan er groundtruth gemaakt worden voor elke regel door de tekst aan te passen in het tekst vak IV. wanneer je dit gedaan hebt, kan je met Apply, Next of Previous deze aanpassingen permanent maken. Via Next en Previous kan je heen een weer maneauvreren tussen de regels. 
+7. Wanneer alle regels zijn getranscribeert, kan je ze met de "save" knop downloaden naar de computer, samen met een file met de gemiddelde CER's en een map waar alle groundtruth in staat. je krijgt dan een waarschuwing dat de browser meerdere files tegelijkertijd probeert te downloaden. Accepteer deze melding.
+8. open de download pagina van de browser, aan de hand van het drie puntjes menu in de top rechts van de browser. klik dan op "show in folder" voor een van de bestanden die net gedownload zijn.
+9. Vanaf hier kan je de drie net gedownloade files in de regel_check/regel_check_output map zetten
