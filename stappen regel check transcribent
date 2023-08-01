@@ -1,0 +1,3 @@
+1. transcribent runt de vdi programma vanaf zijn eigen computer, dit opent een connectie naar de terminal server, en opent daar de regel_check.html tool automatisch
+2. de transcribent klikt op de knop "choose files". nu wordt de file explorer geopend. vanuit hier navigeert de transcribent naar de map "regel_check", en dan naar de map "regel_check_input". In die map staan submappen voor elke batch, aangegeven met de code van de batch. 
+3.
