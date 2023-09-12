@@ -1,4 +1,4 @@
-1. Krijg een steekproef van controle. 
+1. ontvang een steekproef van controle. 
 2. Transcribeer de steekproef
 3. Run create_train_data_500 /home/rutger/data/7 /home/rutger/data/train_7  (vul de locatie van de steekproef in, en de naam van de map waar je wil dat de trainingsdata naar toe gaat. deze mappen moeten wel bestaan)
 4. Run grab_files_and_images /home/rutger/data/train_7  /home/rutger/data/train_7_output (vul de locatie van de steekproef in, en de naam van de map waar je wil dat de trainingsdata naar toe gaat)
