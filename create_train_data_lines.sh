@@ -35,7 +35,7 @@ echo "inputfiles: " `find $inputdir|wc -l`
 #/home/rutger/src/opencvtest2/agenttesseract/target/appassembler/bin/MinionCutFromImageBasedOnPageXMLNew -input_path $inputdir -outputbase $outputdir -channels 4 -output_type png -write_text_contents -threads $numthreads
 echo docker run --rm -v $inputdir/:$inputdir/ -v $outputdir:$outputdir dockeranalyzerwebservice_analyzerwebservice /src/agenttesseract/target/appassembler/bin/MinionCutFromImageBasedOnPageXMLNew -input_path $inputdir -outputbase $outputdir -channels 4 -output_type png -write_text_contents -threads $numthreads
 docker run --rm -v $inputdir/:$inputdir/ -v $outputdir:$outputdir docker.loghi-tooling \
-  /src/loghi-tooling/minions/target/appassembler/bin/MinionCutFromImageBasedOnPageXMLNew -input_path $inputdir -outputbase $outputdir -channels 4 -output_type png -write_text_contents -threads $numthreads
+  /src/loghi-tooling/minions/target/appassembler/bin/MinionCutFromImageBasedOnPageXMLNew -input_path $inputdir -outputbase $outputdir -channels 3 -output_type png -write_text_contents -threads $numthreads
 
 echo "outputfiles: " `find $outputdir|wc -l`
 
@@ -52,7 +52,7 @@ do
 done
 
  
-grep -E '.{130,}' $filelist > $longlines
+grep -E '.{150,}' $filelist > $longlines
 
 shuf $longlines> shuffled
 head -n 100 shuffled > $filelisttrain #Here the change needs to be made if you want to perform this with other values. 
