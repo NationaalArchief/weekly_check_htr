@@ -35,6 +35,8 @@
     <!-- Textbox prompt for editing -->
     <h2>Edit Text File</h2>
     <div id="fileContentContainer">
+        <p>index number of line:</p>
+        <p id="indexnumberofline"></p>
         <p>Original Content:</p>
         <p id="originalContent"></p>
         <br>
@@ -93,7 +95,6 @@
         let averageCER = 0; // Average CER
         let averageCapitalIndependentCER = 0; // Average Capital Independent CER
         let averageSimpleCER = 0; // Average Simple CER
-        let numChanges = 0; // Number of changes made
 
 
         // Function to add a new row to the table
@@ -186,7 +187,6 @@
         async function uploadFilesGroundTruth() {
             let fileInput = document.getElementById("fileUploadGT");
             let fileList = document.getElementById("fileContainer");
-            let gt_list = {}
 
             for (let i = 0; i < fileInput.files.length; i++) {
                 let file = fileInput.files[i];
@@ -214,6 +214,9 @@
 
                 }
             }
+            console.log(filePairs)
+            // Display the first pair
+            displayCurrentPair(); //this resolves before all the files are read. not sure how to solve that
 
         }
 
@@ -239,6 +242,7 @@
             // Display text content
             let originalContent = document.getElementById("originalContent");
             let changedContent = document.getElementById("changedContent");
+            let indexnumberofline = document.getElementById("indexnumberofline");
             let cerElement = document.getElementById("cer");
             let capitalIndependentCERElement = document.getElementById("capitalIndependentCER");
             let simpleCERElement = document.getElementById("simpleCER");
@@ -246,6 +250,7 @@
 
             // Set the original text content
             originalContent.innerHTML = currentPair.txt;
+            indexnumberofline.innerHTML = currentPairIndex + 1
 
             // Set the text in the textarea for editing
             document.getElementById("fileContent").value = currentPair.chngdtxt;
@@ -304,6 +309,39 @@
             return averageCER;
         }
 
+        function calculateAverageCERAllText(cercolumn, text) {
+            let table = document.getElementById("filePairTable");
+            let rows = table.getElementsByTagName("tr");
+            let sumMistakes = 0;
+            let sumText = 0;
+
+            for (let i = 0; i < rows.length; i++) {
+                let cells = rows[i].getElementsByTagName("td");
+                if (cells.length >= cercolumn) {
+                    let cerCell = cells[cercolumn];
+                    let cerValue = parseFloat(cerCell.textContent || cerCell.innerText);
+                    console.log("de cer was:" + cerValue)
+                    let textCell = cells[text];
+                    console.log("de textcell was:" + textCell)
+                    let textValue = textCell.textContent || textCell.innerText;
+                    console.log("de tekst was:" + textValue)
+                    let textLength = textValue.length;
+                    console.log("de tekst length:" + textLength)
+                    let mistakeInterval = 100 / textLength;
+                    let mistakeNumber = cerValue / mistakeInterval
+                    if (!isNaN(cerValue)) {
+                        sumMistakes += mistakeNumber;
+                        sumText += textLength;
+                        console.log("de cer was:" + cerValue + " mistake en text length" + mistakeNumber + "  " + textLength)
+                    }
+                }
+            }
+
+            let averageCER = (sumMistakes / sumText) * 100;
+            console.log("Average CER: " + averageCER);
+            return averageCER;
+        }
+
         function applyChanges() {
             let content = document.getElementById("fileContent").value;
             let originalContent = document.getElementById("originalContent").innerHTML;
@@ -329,8 +367,6 @@
             let averageCER = calculateAverageCER(4);
             let averageCapitalIndependentCER = calculateAverageCER(5);
             let averageSimpleCER = calculateAverageCER(6);
-
-            numChanges++;
 
             //update changed content not succesfull
             let currentPair = filePairs[Object.keys(filePairs)[currentPairIndex]];
@@ -401,11 +437,13 @@
 
         function printChangedContentMap() {
             let content = "";
-
+            let index = 0;
             for (const filePair of Object.values(filePairs)) {
                 let originalContent = "";
                 // Read the text content of the original file
                 originalContent = filePair.txt
+                index++
+                content += "line number:\n" + index + "\n";
                 content += "Original Content:\n" + originalContent + "\n";
                 content += "Changed Content:\n" + filePair.chngdtxt + "\n";
                 content += "------------------------\n";
@@ -434,7 +472,8 @@
                 // Create a temporary link element
                 let link = document.createElement("a");
                 link.href = URL.createObjectURL(blob);
-                link.download = currentPair.txt.name.replace('.txt', '__gt.txt'); // Update file name
+                link.download = currentPair.txt.name.replace('.txt', 'groundtruth.txt'); // Update file name
+                console.log("new name: ", link.download);
 
                 // Programmatically click the link to trigger the download
                 link.click();
@@ -467,15 +506,15 @@
             //create zip files for each thing
             for (const [filename, filePair] of Object.entries(filePairs)) {
 
-                zip.file(filename, filePair.chngdtxt)
+                zip.file(filename + "_groundtruth.txt", filePair.chngdtxt)
             }
             zip.generateAsync({ type: "blob" }).then(function (content) {
                 saveAs(content, "groundtruth zip");
             });
             // Call the function to calculate and display the average CER
-            let averageCER = calculateAverageCER(4);
-            let averageCapitalIndependentCER = calculateAverageCER(5);
-            let averageSimpleCER = calculateAverageCER(6);
+            let averageCER = calculateAverageCERAllText(4, 2);
+            let averageCapitalIndependentCER = calculateAverageCERAllText(5, 2);
+            let averageSimpleCER = calculateAverageCERAllText(6, 2);
 
             // Create a new blob with the updated content
             let blob = new Blob([content], { type: "text/plain" });
