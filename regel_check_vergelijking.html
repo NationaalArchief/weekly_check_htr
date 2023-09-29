@@ -193,7 +193,7 @@
                 let fileName = file.name;
                 let fileType = file.type;
                 let fileExtension = fileName.split(".").pop();
-                let fileBaseName = fileName.substring(0, fileName.lastIndexOf("."));
+                let fileBaseName = fileName.substring(0, fileName.lastIndexOf("_groundtruth."));
 
                 if (!filePairs[fileBaseName]) {
                     console.log("uploadFilesGT: GT does not match the content")
@@ -235,9 +235,9 @@
             img.src = URL.createObjectURL(currentPair.png);
             img.height = 60;
             fileList.appendChild(img);
-            console.log("check display img", currentPair.png);
-            console.log("check display txt", currentPair.txt);
-            console.log("check display chngdtxt", currentPair.chngdtxt);
+            console.log("check display img ", currentPair.png);
+            console.log("check display txt ", currentPair.txt);
+            console.log("check display chngdtxt ", currentPair.chngdtxt);
 
             // Display text content
             let originalContent = document.getElementById("originalContent");
@@ -246,7 +246,7 @@
             let cerElement = document.getElementById("cer");
             let capitalIndependentCERElement = document.getElementById("capitalIndependentCER");
             let simpleCERElement = document.getElementById("simpleCER");
-            console.log("check display txt", currentPair.chngdtxt);
+            console.log("check display txt ", currentPair.chngdtxt);
 
             // Set the original text content
             originalContent.innerHTML = currentPair.txt;
@@ -320,19 +320,19 @@
                 if (cells.length >= cercolumn) {
                     let cerCell = cells[cercolumn];
                     let cerValue = parseFloat(cerCell.textContent || cerCell.innerText);
-                    console.log("de cer was:" + cerValue)
+                    console.log("de cer was: " + cerValue)
                     let textCell = cells[text];
-                    console.log("de textcell was:" + textCell)
+                    console.log("de textcell was: " + textCell)
                     let textValue = textCell.textContent || textCell.innerText;
-                    console.log("de tekst was:" + textValue)
+                    console.log("de tekst was: " + textValue)
                     let textLength = textValue.length;
-                    console.log("de tekst length:" + textLength)
+                    console.log("de tekst length: " + textLength)
                     let mistakeInterval = 100 / textLength;
                     let mistakeNumber = cerValue / mistakeInterval
                     if (!isNaN(cerValue)) {
                         sumMistakes += mistakeNumber;
                         sumText += textLength;
-                        console.log("de cer was:" + cerValue + " mistake en text length" + mistakeNumber + "  " + textLength)
+                        console.log("de cer was: " + cerValue + " mistake en text length: " + mistakeNumber + ",  " + textLength)
                     }
                 }
             }
