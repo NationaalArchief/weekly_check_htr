@@ -437,16 +437,23 @@
                 link.click();
 
                 // Call the function to calculate and display the average CER
-                let averageCER = calculateAverageCER(4);
-                let averageCapitalIndependentCER = calculateAverageCER(5);
-                let averageSimpleCER = calculateAverageCER(6);
+                let averageCER = calculateAverageCERAllText(4, 2);
+                let averageCapitalIndependentCER = calculateAverageCERAllText(5, 2);
+                let averageSimpleCER = calculateAverageCERAllText(6, 2);
+                let averageCERperLines = calculateAverageCER(4);
+                let averageCapitalIndependentCERperLines = calculateAverageCER(5);
+                let averageSimpleCERperLines = calculateAverageCER(6);
 
 
                 // Save average CER values to a file
                 let averageCERText = "Average CER: " + averageCER.toFixed(2) + "%";
                 let averageCapitalIndependentCERText = "Average Capital Independent CER: " + averageCapitalIndependentCER.toFixed(2) + "%";
                 let averageSimpleCERText = "Average Simple CER: " + averageSimpleCER.toFixed(2) + "%";
-                let averageCERBlob = new Blob([averageCERText + "\n" + averageCapitalIndependentCERText + "\n" + averageSimpleCERText], { type: "text/plain" });
+                let averageCERTextperLines = "Average CER taken as an average of the CER per line: " + averageCERperLines.toFixed(2) + "%";
+                let averageCapitalIndependentCERTextperLines = "Average Capital Independent CER taken as an average of the CER per line: " + averageCapitalIndependentCERperLines.toFixed(2) + "%";
+                let averageSimpleCERTextperLines = "Average Simple CER taken as an average of the CER per line: " + averageSimpleCERperLines.toFixed(2) + "%";
+                let batchAverages = "fill in batchname" + averageCER.toFixed(2) + " " + averageCapitalIndependentCER.toFixed(2) + " " + averageSimpleCER.toFixed(2) + " " + averageCERperLines.toFixed(2) + "   " + averageCapitalIndependentCERperLines.toFixed(2) + " " + averageSimpleCERperLines.toFixed(2);
+                let averageCERBlob = new Blob([averageCERText + "\n" + averageCapitalIndependentCERText + "\n" + averageSimpleCERText + "\n" + averageCERTextperLines + "\n" + averageCapitalIndependentCERTextperLines + "\n" + averageSimpleCERTextperLines + "\n" + batchAverages], { type: "text/plain" });
                 let averageCERLink = document.createElement("a");
                 averageCERLink.href = URL.createObjectURL(averageCERBlob);
                 averageCERLink.download = "average_cer.txt";
@@ -473,6 +480,9 @@
             let averageCER = calculateAverageCERAllText(4, 2);
             let averageCapitalIndependentCER = calculateAverageCERAllText(5, 2);
             let averageSimpleCER = calculateAverageCERAllText(6, 2);
+            let averageCERperLines = calculateAverageCER(4, 2);
+            let averageCapitalIndependentCERperLines = calculateAverageCER(5, 2);
+            let averageSimpleCERperLines = calculateAverageCER(6, 2);
 
             // Create a new blob with the updated content
             let blob = new Blob([content], { type: "text/plain" });
@@ -481,7 +491,11 @@
             let averageCERText = "Average CER: " + averageCER.toFixed(2) + "%";
             let averageCapitalIndependentCERText = "Average Capital Independent CER: " + averageCapitalIndependentCER.toFixed(2) + "%";
             let averageSimpleCERText = "Average Simple CER: " + averageSimpleCER.toFixed(2) + "%";
-            let averageCERBlob = new Blob([averageCERText + "\n" + averageCapitalIndependentCERText + "\n" + averageSimpleCERText], { type: "text/plain" });
+            let averageCERTextperLines = "Average CER taken as an average of the CER per line: " + averageCERperLines.toFixed(2) + "%";
+            let averageCapitalIndependentCERTextperLines = "Average Capital Independent CER taken as an average of the CER per line: " + averageCapitalIndependentCERperLines.toFixed(2) + "%";
+            let averageSimpleCERTextperLines = "Average Simple CER taken as an average of the CER per line: " + averageSimpleCERperLines.toFixed(2) + "%";
+            let batchAverages = "fill in batchname" + averageCER.toFixed(2) + " " + averageCapitalIndependentCER.toFixed(2) + " " + averageSimpleCER.toFixed(2) + " " + averageCERperLines.toFixed(2) + "   " + averageCapitalIndependentCERperLines.toFixed(2) + " " + averageSimpleCERperLines.toFixed(2);
+            let averageCERBlob = new Blob([averageCERText + "\n" + averageCapitalIndependentCERText + "\n" + averageSimpleCERText + "\n" + averageCERTextperLines + "\n" + averageCapitalIndependentCERTextperLines + "\n" + averageSimpleCERTextperLines + "\n" + batchAverages], { type: "text/plain" });
             let averageCERLink = document.createElement("a");
             averageCERLink.href = URL.createObjectURL(averageCERBlob);
             averageCERLink.download = "average_cer.txt";
